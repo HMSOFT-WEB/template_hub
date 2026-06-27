@@ -47,7 +47,7 @@ const templates = [
     title: "Enterprise Corporate",
     category: "Corporate",
     desc: "A premium, trustworthy UI for global IT enterprises and B2B services. Features 3D data visualization.",
-    url: "https://HMSOFT-WEB.github.io/company_template1/",
+    url: "https://HMSOFT-WEB.github.io/corporate_template/",
     img: thumb1
   },
   {
