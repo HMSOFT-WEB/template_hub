@@ -8,6 +8,17 @@ import * as random from 'maath/random/dist/maath-random.esm';
 import './index.css';
 
 import logo from './assets/logo.png';
+import thumb1 from './assets/thumb1.png';
+import thumb2 from './assets/thumb2.png';
+import thumb3 from './assets/thumb3.png';
+import thumb4 from './assets/thumb4.png';
+import thumb5 from './assets/thumb5.png';
+import thumb6 from './assets/thumb6.png';
+import thumb7 from './assets/thumb7.png';
+import thumb8 from './assets/thumb8.png';
+import thumb9 from './assets/thumb9.png';
+import thumb10 from './assets/thumb10.png';
+import thumb11 from './assets/thumb11.png';
 
 // 3D Starfield Background
 function Starfield(props) {
@@ -37,7 +48,7 @@ const templates = [
     category: "Corporate",
     desc: "A premium, trustworthy UI for global IT enterprises and B2B services. Features 3D data visualization.",
     url: "https://HMSOFT-WEB.github.io/corporate_template/",
-    icon: "🏢"
+    img: thumb1
   },
   {
     id: 2,
@@ -45,7 +56,7 @@ const templates = [
     category: "Science",
     desc: "Clean, pristine design for medical, pharma, and biotech companies with interactive DNA models.",
     url: "https://HMSOFT-WEB.github.io/bio_template2/",
-    icon: "🧬"
+    img: thumb2
   },
   {
     id: 3,
@@ -53,7 +64,7 @@ const templates = [
     category: "Industry",
     desc: "Robust, solid brutalist design for engineering and architecture firms. Features a 3D structural model.",
     url: "https://HMSOFT-WEB.github.io/construction_template3/",
-    icon: "🏗️"
+    img: thumb3
   },
   {
     id: 4,
@@ -61,7 +72,7 @@ const templates = [
     category: "Commerce",
     desc: "Modern luxury retail storefront with dynamic product carousels and immersive shopping experiences.",
     url: "https://HMSOFT-WEB.github.io/ecommerce_template4/",
-    icon: "🛍️"
+    img: thumb4
   },
   {
     id: 5,
@@ -69,7 +80,7 @@ const templates = [
     category: "Tech",
     desc: "Data-driven UI for cloud software, featuring glassmorphism and real-time dashboard analytics.",
     url: "https://HMSOFT-WEB.github.io/platform_template5/",
-    icon: "📊"
+    img: thumb5
   },
   {
     id: 6,
@@ -77,7 +88,7 @@ const templates = [
     category: "Education",
     desc: "Interactive, engaging design for online academies and universities. Friendly and accessible.",
     url: "https://HMSOFT-WEB.github.io/education_template6/",
-    icon: "🎓"
+    img: thumb6
   },
   {
     id: 7,
@@ -85,7 +96,7 @@ const templates = [
     category: "Commerce",
     desc: "Elegant pastel aesthetic with high-end 3D glass refraction (serum bottle) for beauty brands.",
     url: "https://HMSOFT-WEB.github.io/cosmetics_template7/",
-    icon: "✨"
+    img: thumb7
   },
   {
     id: 8,
@@ -93,7 +104,7 @@ const templates = [
     category: "Commerce",
     desc: "Deep, moody dark mode design for artisan roasteries. Features an interactive 3D coffee bean.",
     url: "https://HMSOFT-WEB.github.io/coffee_template8/",
-    icon: "☕"
+    img: thumb8
   },
   {
     id: 9,
@@ -101,7 +112,7 @@ const templates = [
     category: "Tech",
     desc: "Aggressive cyberpunk styling, neon accents, and mechanical 3D switch animations for gamers.",
     url: "https://HMSOFT-WEB.github.io/gaming_template9/",
-    icon: "⌨️"
+    img: thumb9
   },
   {
     id: 10,
@@ -109,7 +120,7 @@ const templates = [
     category: "Commerce",
     desc: "Hypebeast culture aesthetic with brutalist typography and heavy contrast for sneaker drops.",
     url: "https://HMSOFT-WEB.github.io/streetwear_template10/",
-    icon: "👟"
+    img: thumb10
   },
   {
     id: 11,
@@ -117,7 +128,7 @@ const templates = [
     category: "Commerce",
     desc: "Scandinavian minimalism, warm taupe tones, and organic 3D shapes for premium furniture.",
     url: "https://HMSOFT-WEB.github.io/interior_template11/",
-    icon: "🛋️"
+    img: thumb11
   }
 ];
 
@@ -193,7 +204,7 @@ function App() {
 
           <motion.div layout className="grid">
             <AnimatePresence>
-              {filteredTemplates.map((template, idx) => (
+              {filteredTemplates.map((template) => (
                 <motion.div 
                   key={template.id}
                   layout
@@ -203,8 +214,13 @@ function App() {
                   transition={{ duration: 0.3 }}
                   className="card"
                 >
-                  <div className="card-img-placeholder">
-                    <span style={{ fontSize: '5rem' }}>{template.icon}</span>
+                  <div className="card-img-placeholder" style={{ padding: 0 }}>
+                    <img 
+                      src={template.img} 
+                      alt={template.title} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      onError={(e) => { e.target.style.display='none' }} 
+                    />
                     <div className="card-number">{String(template.id).padStart(2, '0')}</div>
                   </div>
                   <div className="card-content">
