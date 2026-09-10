@@ -1,251 +1,43 @@
-import React, { useState, useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, ArrowRight, Code } from 'lucide-react';
-import * as THREE from 'three';
-import * as random from 'maath/random/dist/maath-random.esm';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowUpRight, Bookmark, Check, ChevronRight, ExternalLink, Filter, Search, X } from 'lucide-react';
 import './index.css';
 
-import logo from './assets/logo.png';
-import thumb1 from './assets/thumb1.png';
-import thumb2 from './assets/thumb2.png';
-import thumb3 from './assets/thumb3.png';
-import thumb4 from './assets/thumb4.png';
-import thumb5 from './assets/thumb5.png';
-import thumb6 from './assets/thumb6.png';
-import thumb7 from './assets/thumb7.png';
-import thumb8 from './assets/thumb8.png';
-import thumb9 from './assets/thumb9.png';
-import thumb10 from './assets/thumb10.png';
-import thumb11 from './assets/thumb11.png';
-
-// 3D Starfield Background
-function Starfield(props) {
-  const ref = useRef();
-  const [sphere] = useState(() => random.inSphere(new Float32Array(5000), { radius: 1.5 }));
-
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.x -= delta / 10;
-      ref.current.rotation.y -= delta / 15;
-    }
-  });
-
-  return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
-        <PointMaterial transparent color="#7928ca" size={0.005} sizeAttenuation={true} depthWrite={false} />
-      </Points>
-    </group>
-  );
-}
-
 const templates = [
-  {
-    id: 1,
-    title: "Enterprise Corporate",
-    category: "Corporate",
-    desc: "A premium, trustworthy UI for global IT enterprises and B2B services. Features 3D data visualization.",
-    url: "https://HMSOFT-WEB.github.io/corporate_template/",
-    img: thumb1
-  },
-  {
-    id: 2,
-    title: "Bio Healthcare",
-    category: "Science",
-    desc: "Clean, pristine design for medical, pharma, and biotech companies with interactive DNA models.",
-    url: "https://HMSOFT-WEB.github.io/bio_template2/",
-    img: thumb2
-  },
-  {
-    id: 3,
-    title: "Heavy Construction",
-    category: "Industry",
-    desc: "Robust, solid brutalist design for engineering and architecture firms. Features a 3D structural model.",
-    url: "https://HMSOFT-WEB.github.io/construction_template3/",
-    img: thumb3
-  },
-  {
-    id: 4,
-    title: "Global E-Commerce",
-    category: "Commerce",
-    desc: "Modern luxury retail storefront with dynamic product carousels and immersive shopping experiences.",
-    url: "https://HMSOFT-WEB.github.io/ecommerce_template4/",
-    img: thumb4
-  },
-  {
-    id: 5,
-    title: "SaaS Platform Dashboard",
-    category: "Tech",
-    desc: "Data-driven UI for cloud software, featuring glassmorphism and real-time dashboard analytics.",
-    url: "https://HMSOFT-WEB.github.io/platform_template5/",
-    img: thumb5
-  },
-  {
-    id: 6,
-    title: "EdTech Education",
-    category: "Education",
-    desc: "Interactive, engaging design for online academies and universities. Friendly and accessible.",
-    url: "https://HMSOFT-WEB.github.io/education_template6/",
-    img: thumb6
-  },
-  {
-    id: 7,
-    title: "Vegan Cosmetics",
-    category: "Commerce",
-    desc: "Elegant pastel aesthetic with high-end 3D glass refraction (serum bottle) for beauty brands.",
-    url: "https://HMSOFT-WEB.github.io/cosmetics_template7/",
-    img: thumb7
-  },
-  {
-    id: 8,
-    title: "Specialty Coffee",
-    category: "Commerce",
-    desc: "Deep, moody dark mode design for artisan roasteries. Features an interactive 3D coffee bean.",
-    url: "https://HMSOFT-WEB.github.io/coffee_template8/",
-    img: thumb8
-  },
-  {
-    id: 9,
-    title: "Esports Gaming Gear",
-    category: "Tech",
-    desc: "Aggressive cyberpunk styling, neon accents, and mechanical 3D switch animations for gamers.",
-    url: "https://HMSOFT-WEB.github.io/gaming_template9/",
-    img: thumb9
-  },
-  {
-    id: 10,
-    title: "Streetwear Fashion",
-    category: "Commerce",
-    desc: "Hypebeast culture aesthetic with brutalist typography and heavy contrast for sneaker drops.",
-    url: "https://HMSOFT-WEB.github.io/streetwear_template10/",
-    img: thumb10
-  },
-  {
-    id: 11,
-    title: "Minimal Interior Design",
-    category: "Commerce",
-    desc: "Scandinavian minimalism, warm taupe tones, and organic 3D shapes for premium furniture.",
-    url: "https://HMSOFT-WEB.github.io/interior_template11/",
-    img: thumb11
-  }
+  {id:'corporate',number:'01',title:'Enterprise Corporate',category:'Corporate',tag:'B2B / ENTERPRISE',desc:'A clear, confident surface for global IT and infrastructure teams.',url:'https://HMSOFT-WEB.github.io/corporate_template/',image:'/thumbnails/corporate.jpg',stack:'React · Vite · Data visualisation',tone:'navy',featured:true},
+  {id:'bio',number:'02',title:'Bio Healthcare',category:'Science',tag:'HEALTH / SCIENCE',desc:'Calm, precise storytelling for medical and biotech organisations.',url:'https://HMSOFT-WEB.github.io/bio_template2/',image:'/thumbnails/bio.jpg',stack:'React · Three.js · Motion',tone:'mint'},
+  {id:'construction',number:'03',title:'Heavy Construction',category:'Industry',tag:'ENGINEERING / BUILT',desc:'A direct and durable system for engineering, architecture and build teams.',url:'https://HMSOFT-WEB.github.io/construction_template3/',image:'/thumbnails/construction.jpg',stack:'React · Three.js · Motion',tone:'yellow'},
+  {id:'commerce',number:'04',title:'Global E-Commerce',category:'Commerce',tag:'RETAIL / PRODUCT',desc:'A flexible storefront for collections, campaigns and conversion.',url:'https://HMSOFT-WEB.github.io/ecommerce_template4/',image:'/thumbnails/commerce.jpg',stack:'React · Vite · Carousel',tone:'red'},
+  {id:'platform',number:'05',title:'SaaS Platform',category:'Tech',tag:'SOFTWARE / PRODUCT',desc:'A focused product shell for cloud tools, data and team workflows.',url:'https://HMSOFT-WEB.github.io/platform_template5/',image:'/thumbnails/platform.jpg',stack:'React · Charts · Dashboard',tone:'violet'},
+  {id:'education',number:'06',title:'EdTech Education',category:'Education',tag:'LEARNING / COMMUNITY',desc:'A welcoming learning surface for academies, courses and cohorts.',url:'https://HMSOFT-WEB.github.io/education_template6/',image:'/thumbnails/education.jpg',stack:'React · Motion · Course UI',tone:'blue'},
+  {id:'cosmetics',number:'07',title:'Vegan Cosmetics',category:'Commerce',tag:'BEAUTY / DTC',desc:'A tactile product story for conscious skincare and beauty brands.',url:'https://HMSOFT-WEB.github.io/cosmetics_template7/',image:'/thumbnails/cosmetics.jpg',stack:'React · WebGL · Commerce',tone:'peach'},
+  {id:'coffee',number:'08',title:'Specialty Coffee',category:'Commerce',tag:'FOOD / PLACE',desc:'A slower, darker storefront for roasters, cafés and seasonal drops.',url:'https://HMSOFT-WEB.github.io/coffee_template8/',image:'/thumbnails/coffee.jpg',stack:'React · Three.js · Motion',tone:'brown'},
+  {id:'gaming',number:'09',title:'Esports Gear',category:'Tech',tag:'GAMING / HARDWARE',desc:'An energetic product launch system for competitive hardware.',url:'https://HMSOFT-WEB.github.io/gaming_template9/',image:'/thumbnails/gaming.jpg',stack:'React · WebGL · Product UI',tone:'lime'},
+  {id:'streetwear',number:'10',title:'Streetwear Fashion',category:'Commerce',tag:'FASHION / DROP',desc:'A high-contrast release page for limited collections and drops.',url:'https://HMSOFT-WEB.github.io/streetwear_template10/',image:'/thumbnails/streetwear.jpg',stack:'React · Motion · Commerce',tone:'pink'},
+  {id:'interior',number:'11',title:'Minimal Interior',category:'Commerce',tag:'SPACE / OBJECT',desc:'An editorial catalogue for considered furniture and interior brands.',url:'https://HMSOFT-WEB.github.io/interior_template11/',image:'/thumbnails/interior.jpg',stack:'React · Three.js · Catalogue',tone:'taupe'},
+  {id:'onyu',number:'12',title:'ONYU Private Residence',category:'Architecture',tag:'ARCHITECTURE / STORY',desc:'A cinematic model-house tour that moves from arrival to courtyard.',url:'https://atelier-house-seven.vercel.app/',image:'/thumbnails/onyu.jpg',stack:'Vite · Image sequence · Scroll',tone:'olive',featured:true},
+  {id:'serein',number:'13',title:'SEREIN Coastal Retreat',category:'Hospitality',tag:'HOTEL / EXPERIENCE',desc:'A boutique hotel system with room comparison and booking demo.',url:'https://serein-retreat.vercel.app/',image:'/thumbnails/serein.jpg',stack:'Vite · Image sequence · Booking demo',tone:'sea',featured:true},
 ];
+const categories=['All','Commerce','Corporate','Tech','Science','Industry','Education','Architecture','Hospitality'];
 
-const categories = ["All", "Commerce", "Corporate", "Tech", "Science", "Industry", "Education"];
-
-function App() {
-  const [filter, setFilter] = useState("All");
-
-  const filteredTemplates = filter === "All" 
-    ? templates 
-    : templates.filter(t => t.category === filter);
-
-  return (
-    <>
-      <div className="canvas-bg">
-        <Canvas camera={{ position: [0, 0, 1] }}>
-          <Starfield />
-        </Canvas>
-      </div>
-
-      <header className="header">
-        <div className="logo">
-          <img src={logo} alt="HMSOFT WEB" onError={(e) => e.target.style.display='none'} />
-          HMSOFT WEB
-        </div>
-      </header>
-
+function App(){
+  const [query,setQuery]=useState(''); const [category,setCategory]=useState('All'); const [saved,setSaved]=useState(()=>JSON.parse(localStorage.getItem('hmsoft-saved')||'[]')); const [selected,setSelected]=useState(null); const [onlySaved,setOnlySaved]=useState(false); const [menu,setMenu]=useState(false);
+  useEffect(()=>localStorage.setItem('hmsoft-saved',JSON.stringify(saved)),[saved]);
+  useEffect(()=>{if(!selected)return;const close=e=>e.key==='Escape'&&setSelected(null);addEventListener('keydown',close);return()=>removeEventListener('keydown',close)},[selected]);
+  const toggleSave=id=>setSaved(s=>s.includes(id)?s.filter(x=>x!==id):[...s,id]);
+  const filtered=useMemo(()=>templates.filter(t=>{const matchesCategory=category==='All'||t.category===category;const q=query.trim().toLowerCase();const matchesQuery=!q||`${t.title} ${t.category} ${t.tag} ${t.desc}`.toLowerCase().includes(q);return matchesCategory&&matchesQuery&&(!onlySaved||saved.includes(t.id))}),[category,query,onlySaved,saved]);
+  return <div className="app-shell">
+    <aside className={`sidebar ${menu?'open':''}`}><div className="side-head"><a className="wordmark" href="#top">HM<span>SOFT</span></a><button className="close-side" onClick={()=>setMenu(false)} aria-label="Close menu"><X size={18}/></button></div><p className="side-intro">A working library of<br/>web directions.</p><nav className="side-nav"><a className="active" href="#catalog">Catalog <span>{String(templates.length).padStart(2,'0')}</span></a><a href="#about">About this hub</a><a href="#notes">Notes &amp; process</a></nav><div className="side-bottom"><p>HMSOFT WEB<br/><span>Independent studio · 2026</span></p><a href="mailto:hello@hmsoft.it.kr">hello@hmsoft.it.kr ↗</a></div></aside>
+    <div className="workspace" id="top"><header className="topbar"><button className="mobile-menu" onClick={()=>setMenu(true)} aria-label="Open menu"><span></span><span></span></button><div className="crumb"><span>HMSOFT WEB</span><ChevronRight size={13}/><strong>Template catalog</strong></div><div className="top-actions"><button className={onlySaved?'saved-active':''} onClick={()=>setOnlySaved(v=>!v)}><Bookmark size={15} fill={onlySaved?'currentColor':'none'}/> Saved <span>{saved.length}</span></button><a href="mailto:hello@hmsoft.it.kr" className="contact">Start a project <ArrowUpRight size={15}/></a></div></header>
       <main>
-        <section className="hero">
-          <motion.div 
-            className="hero-badge"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            HMSOFT WEB TEMPLATE HUB
-          </motion.div>
-          <motion.h1 
-            className="hero-title"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            The Ultimate Collection of <br/> <span>Premium 3D Web Experiences.</span>
-          </motion.h1>
-          <motion.p 
-            className="hero-desc"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            Browse through our 11 meticulously crafted, industry-specific web application templates. 
-            Powered by React, Three.js, and Framer Motion.
-          </motion.p>
-        </section>
-
-        <section className="main-content">
-          <motion.div 
-            className="filter-bar"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            {categories.map(cat => (
-              <button 
-                key={cat} 
-                className={`filter-btn ${filter === cat ? 'active' : ''}`}
-                onClick={() => setFilter(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </motion.div>
-
-          <motion.div layout className="grid">
-            <AnimatePresence>
-              {filteredTemplates.map((template) => (
-                <motion.div 
-                  key={template.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  className="card"
-                >
-                  <div className="card-img-placeholder" style={{ padding: 0 }}>
-                    <img 
-                      src={template.img} 
-                      alt={template.title} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                      onError={(e) => { e.target.style.display='none' }} 
-                    />
-                    <div className="card-number">{String(template.id).padStart(2, '0')}</div>
-                  </div>
-                  <div className="card-content">
-                    <div className="card-category">{template.category}</div>
-                    <h3 className="card-title">{template.title}</h3>
-                    <p className="card-desc">{template.desc}</p>
-                    <div className="card-footer">
-                      <a href={template.url} target="_blank" rel="noreferrer" className="btn-visit">
-                        Visit Live Site <ArrowRight size={18} />
-                      </a>
-                      <Code size={20} color="var(--text-muted)" />
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </section>
-      </main>
-
-      <footer className="footer">
-        <p>© 2026 HMSOFT Web Agency. All Rights Reserved.</p>
-      </footer>
-    </>
-  );
+        <section className="catalog-hero"><div className="hero-copy"><p className="kicker">WEB DIRECTIONS / 2026</p><h1>Choose a starting<br/><i>point.</i></h1><p className="hero-lede">Thirteen considered starting points for brands, products and places. Open a live site, save a direction, or use the filter to narrow the field.</p></div><div className="hero-aside"><div className="hero-count"><strong>{String(templates.length).padStart(2,'0')}</strong><span>live templates<br/>in the library</span></div><div className="hero-rule"></div><p>We make the first screen<br/>feel like a decision.</p></div></section>
+        <section className="catalog" id="catalog"><div className="catalog-toolbar"><div className="toolbar-left"><span className="result-count">{filtered.length} / {templates.length} directions</span><div className="categories" role="tablist">{categories.map(c=><button key={c} className={category===c?'active':''} onClick={()=>setCategory(c)}>{c}</button>)}</div></div><label className="search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search the library" aria-label="Search templates"/>{query&&<button onClick={()=>setQuery('')} aria-label="Clear search"><X size={14}/></button>}</label></div>{filtered.length?<div className="template-list">{filtered.map((t,i)=><TemplateCard key={t.id} template={t} index={i} saved={saved.includes(t.id)} onSave={()=>toggleSave(t.id)} onOpen={()=>setSelected(t)}/>)}</div>:<div className="empty"><Filter size={20}/><h2>No direction found.</h2><p>Try another word, category or clear the saved filter.</p><button onClick={()=>{setQuery('');setCategory('All');setOnlySaved(false)}}>Reset filters</button></div>}</section>
+        <section className="about-band" id="about"><div><p className="kicker">A SMALL NOTE FROM THE STUDIO</p><h2>Templates are<br/><i>arguments.</i></h2></div><div><p>Each direction is built to make a different business feel obvious. The screenshots are entry points; open the live site to see the interaction, pacing and responsive behaviour.</p><p className="small-note">The library grows as we finish new work. Some directions are internal experiments, some are production-ready starting points.</p><a href="mailto:hello@hmsoft.it.kr">Talk through a brief <ArrowUpRight size={15}/></a></div></section>
+        <section className="process" id="notes"><div className="process-title"><p className="kicker">HOW WE USE THE LIBRARY</p><h2>Start with the<br/><i>shape</i> of the problem.</h2></div><div className="process-steps"><div><b>01</b><h3>Find a direction</h3><p>Filter by the feeling and audience closest to the brief.</p></div><div><b>02</b><h3>Open the real thing</h3><p>Every card links to a working site, not a static mockup.</p></div><div><b>03</b><h3>Make it yours</h3><p>We reshape the direction around your content, product and customers.</p></div></div></section>
+      </main><footer className="footer"><span>© 2026 HMSOFT WEB</span><span>Designed and built in Seoul</span><a href="#top">Back to top ↑</a></footer>
+    </div>
+    {selected&&<TemplateModal template={selected} saved={saved.includes(selected.id)} onSave={()=>toggleSave(selected.id)} onClose={()=>setSelected(null)}/>} 
+  </div>
 }
-
+function TemplateCard({template:t,saved,onSave,onOpen}){return <article className={`template-card tone-${t.tone}`}><button className="thumb" onClick={onOpen} aria-label={`Open details for ${t.title}`}><img src={t.image} alt="" loading="eager"/><span className="thumb-hover">View direction <ArrowUpRight size={16}/></span><span className="thumb-number">{t.number}</span></button><div className="card-body"><div className="card-line"><span className="tag">{t.tag}</span><button className={`save ${saved?'is-saved':''}`} onClick={onSave} aria-label={saved?'Remove from saved':'Save template'}><Bookmark size={16} fill={saved?'currentColor':'none'}/></button></div><button className="card-title" onClick={onOpen}>{t.title}</button><p>{t.desc}</p><div className="card-bottom"><span>{t.stack}</span><a href={t.url} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()}>Live site <ExternalLink size={13}/></a></div></div></article>}
+function TemplateModal({template:t,saved,onSave,onClose}){return <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button className="modal-close" onClick={onClose} aria-label="Close"><X size={18}/></button><div className={`modal-image tone-${t.tone}`}><img src={t.image} alt=""/><span>{t.number} / {t.category}</span></div><div className="modal-copy"><p className="kicker">{t.tag}</p><h2 id="modal-title">{t.title}</h2><p className="modal-desc">{t.desc}</p><div className="specs"><div><span>BUILD</span><strong>{t.stack}</strong></div><div><span>STATUS</span><strong><Check size={14}/> Live preview</strong></div></div><div className="modal-actions"><a className="live-button" href={t.url} target="_blank" rel="noreferrer">Open live site <ArrowUpRight size={16}/></a><button className={`save-button ${saved?'is-saved':''}`} onClick={onSave}><Bookmark size={15} fill={saved?'currentColor':'none'}/>{saved?'Saved':'Save direction'}</button></div></div></section></div>}
 export default App;

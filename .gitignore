@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+check-redesign.mjs
+hub-desktop.png
+hub-mobile.png
