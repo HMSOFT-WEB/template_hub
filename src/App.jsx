@@ -1,43 +1,113 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, Check, ChevronRight, ExternalLink, Filter, Search, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { ArrowUpRight, Bookmark, Check, Search, X } from 'lucide-react';
+import { categories, templates } from './templates';
+import Reel from './Reel';
 import './index.css';
 
-const templates = [
-  {id:'corporate',number:'01',title:'Enterprise Corporate',category:'Corporate',tag:'B2B / ENTERPRISE',desc:'A clear, confident surface for global IT and infrastructure teams.',url:'https://HMSOFT-WEB.github.io/corporate_template/',image:'/thumbnails/corporate.jpg',stack:'React · Vite · Data visualisation',tone:'navy',featured:true},
-  {id:'bio',number:'02',title:'Bio Healthcare',category:'Science',tag:'HEALTH / SCIENCE',desc:'Calm, precise storytelling for medical and biotech organisations.',url:'https://HMSOFT-WEB.github.io/bio_template2/',image:'/thumbnails/bio.jpg',stack:'React · Three.js · Motion',tone:'mint'},
-  {id:'construction',number:'03',title:'Heavy Construction',category:'Industry',tag:'ENGINEERING / BUILT',desc:'A direct and durable system for engineering, architecture and build teams.',url:'https://HMSOFT-WEB.github.io/construction_template3/',image:'/thumbnails/construction.jpg',stack:'React · Three.js · Motion',tone:'yellow'},
-  {id:'commerce',number:'04',title:'Global E-Commerce',category:'Commerce',tag:'RETAIL / PRODUCT',desc:'A flexible storefront for collections, campaigns and conversion.',url:'https://HMSOFT-WEB.github.io/ecommerce_template4/',image:'/thumbnails/commerce.jpg',stack:'React · Vite · Carousel',tone:'red'},
-  {id:'platform',number:'05',title:'SaaS Platform',category:'Tech',tag:'SOFTWARE / PRODUCT',desc:'A focused product shell for cloud tools, data and team workflows.',url:'https://HMSOFT-WEB.github.io/platform_template5/',image:'/thumbnails/platform.jpg',stack:'React · Charts · Dashboard',tone:'violet'},
-  {id:'education',number:'06',title:'EdTech Education',category:'Education',tag:'LEARNING / COMMUNITY',desc:'A welcoming learning surface for academies, courses and cohorts.',url:'https://HMSOFT-WEB.github.io/education_template6/',image:'/thumbnails/education.jpg',stack:'React · Motion · Course UI',tone:'blue'},
-  {id:'cosmetics',number:'07',title:'Vegan Cosmetics',category:'Commerce',tag:'BEAUTY / DTC',desc:'A tactile product story for conscious skincare and beauty brands.',url:'https://HMSOFT-WEB.github.io/cosmetics_template7/',image:'/thumbnails/cosmetics.jpg',stack:'React · WebGL · Commerce',tone:'peach'},
-  {id:'coffee',number:'08',title:'Specialty Coffee',category:'Commerce',tag:'FOOD / PLACE',desc:'A slower, darker storefront for roasters, cafés and seasonal drops.',url:'https://HMSOFT-WEB.github.io/coffee_template8/',image:'/thumbnails/coffee.jpg',stack:'React · Three.js · Motion',tone:'brown'},
-  {id:'gaming',number:'09',title:'Esports Gear',category:'Tech',tag:'GAMING / HARDWARE',desc:'An energetic product launch system for competitive hardware.',url:'https://HMSOFT-WEB.github.io/gaming_template9/',image:'/thumbnails/gaming.jpg',stack:'React · WebGL · Product UI',tone:'lime'},
-  {id:'streetwear',number:'10',title:'Streetwear Fashion',category:'Commerce',tag:'FASHION / DROP',desc:'A high-contrast release page for limited collections and drops.',url:'https://HMSOFT-WEB.github.io/streetwear_template10/',image:'/thumbnails/streetwear.jpg',stack:'React · Motion · Commerce',tone:'pink'},
-  {id:'interior',number:'11',title:'Minimal Interior',category:'Commerce',tag:'SPACE / OBJECT',desc:'An editorial catalogue for considered furniture and interior brands.',url:'https://HMSOFT-WEB.github.io/interior_template11/',image:'/thumbnails/interior.jpg',stack:'React · Three.js · Catalogue',tone:'taupe'},
-  {id:'onyu',number:'12',title:'ONYU Private Residence',category:'Architecture',tag:'ARCHITECTURE / STORY',desc:'A cinematic model-house tour that moves from arrival to courtyard.',url:'https://atelier-house-seven.vercel.app/',image:'/thumbnails/onyu.jpg',stack:'Vite · Image sequence · Scroll',tone:'olive',featured:true},
-  {id:'serein',number:'13',title:'SEREIN Coastal Retreat',category:'Hospitality',tag:'HOTEL / EXPERIENCE',desc:'A boutique hotel system with room comparison and booking demo.',url:'https://serein-retreat.vercel.app/',image:'/thumbnails/serein.jpg',stack:'Vite · Image sequence · Booking demo',tone:'sea',featured:true},
-];
-const categories=['All','Commerce','Corporate','Tech','Science','Industry','Education','Architecture','Hospitality'];
-
-function App(){
-  const [query,setQuery]=useState(''); const [category,setCategory]=useState('All'); const [saved,setSaved]=useState(()=>JSON.parse(localStorage.getItem('hmsoft-saved')||'[]')); const [selected,setSelected]=useState(null); const [onlySaved,setOnlySaved]=useState(false); const [menu,setMenu]=useState(false);
-  useEffect(()=>localStorage.setItem('hmsoft-saved',JSON.stringify(saved)),[saved]);
-  useEffect(()=>{if(!selected)return;const close=e=>e.key==='Escape'&&setSelected(null);addEventListener('keydown',close);return()=>removeEventListener('keydown',close)},[selected]);
-  const toggleSave=id=>setSaved(s=>s.includes(id)?s.filter(x=>x!==id):[...s,id]);
-  const filtered=useMemo(()=>templates.filter(t=>{const matchesCategory=category==='All'||t.category===category;const q=query.trim().toLowerCase();const matchesQuery=!q||`${t.title} ${t.category} ${t.tag} ${t.desc}`.toLowerCase().includes(q);return matchesCategory&&matchesQuery&&(!onlySaved||saved.includes(t.id))}),[category,query,onlySaved,saved]);
-  return <div className="app-shell">
-    <aside className={`sidebar ${menu?'open':''}`}><div className="side-head"><a className="wordmark" href="#top">HM<span>SOFT</span></a><button className="close-side" onClick={()=>setMenu(false)} aria-label="Close menu"><X size={18}/></button></div><p className="side-intro">A working library of<br/>web directions.</p><nav className="side-nav"><a className="active" href="#catalog">Catalog <span>{String(templates.length).padStart(2,'0')}</span></a><a href="#about">About this hub</a><a href="#notes">Notes &amp; process</a></nav><div className="side-bottom"><p>HMSOFT WEB<br/><span>Independent studio · 2026</span></p><a href="mailto:hello@hmsoft.it.kr">hello@hmsoft.it.kr ↗</a></div></aside>
-    <div className="workspace" id="top"><header className="topbar"><button className="mobile-menu" onClick={()=>setMenu(true)} aria-label="Open menu"><span></span><span></span></button><div className="crumb"><span>HMSOFT WEB</span><ChevronRight size={13}/><strong>Template catalog</strong></div><div className="top-actions"><button className={onlySaved?'saved-active':''} onClick={()=>setOnlySaved(v=>!v)}><Bookmark size={15} fill={onlySaved?'currentColor':'none'}/> Saved <span>{saved.length}</span></button><a href="mailto:hello@hmsoft.it.kr" className="contact">Start a project <ArrowUpRight size={15}/></a></div></header>
-      <main>
-        <section className="catalog-hero"><div className="hero-copy"><p className="kicker">WEB DIRECTIONS / 2026</p><h1>Choose a starting<br/><i>point.</i></h1><p className="hero-lede">Thirteen considered starting points for brands, products and places. Open a live site, save a direction, or use the filter to narrow the field.</p></div><div className="hero-aside"><div className="hero-count"><strong>{String(templates.length).padStart(2,'0')}</strong><span>live templates<br/>in the library</span></div><div className="hero-rule"></div><p>We make the first screen<br/>feel like a decision.</p></div></section>
-        <section className="catalog" id="catalog"><div className="catalog-toolbar"><div className="toolbar-left"><span className="result-count">{filtered.length} / {templates.length} directions</span><div className="categories" role="tablist">{categories.map(c=><button key={c} className={category===c?'active':''} onClick={()=>setCategory(c)}>{c}</button>)}</div></div><label className="search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search the library" aria-label="Search templates"/>{query&&<button onClick={()=>setQuery('')} aria-label="Clear search"><X size={14}/></button>}</label></div>{filtered.length?<div className="template-list">{filtered.map((t,i)=><TemplateCard key={t.id} template={t} index={i} saved={saved.includes(t.id)} onSave={()=>toggleSave(t.id)} onOpen={()=>setSelected(t)}/>)}</div>:<div className="empty"><Filter size={20}/><h2>No direction found.</h2><p>Try another word, category or clear the saved filter.</p><button onClick={()=>{setQuery('');setCategory('All');setOnlySaved(false)}}>Reset filters</button></div>}</section>
-        <section className="about-band" id="about"><div><p className="kicker">A SMALL NOTE FROM THE STUDIO</p><h2>Templates are<br/><i>arguments.</i></h2></div><div><p>Each direction is built to make a different business feel obvious. The screenshots are entry points; open the live site to see the interaction, pacing and responsive behaviour.</p><p className="small-note">The library grows as we finish new work. Some directions are internal experiments, some are production-ready starting points.</p><a href="mailto:hello@hmsoft.it.kr">Talk through a brief <ArrowUpRight size={15}/></a></div></section>
-        <section className="process" id="notes"><div className="process-title"><p className="kicker">HOW WE USE THE LIBRARY</p><h2>Start with the<br/><i>shape</i> of the problem.</h2></div><div className="process-steps"><div><b>01</b><h3>Find a direction</h3><p>Filter by the feeling and audience closest to the brief.</p></div><div><b>02</b><h3>Open the real thing</h3><p>Every card links to a working site, not a static mockup.</p></div><div><b>03</b><h3>Make it yours</h3><p>We reshape the direction around your content, product and customers.</p></div></div></section>
-      </main><footer className="footer"><span>© 2026 HMSOFT WEB</span><span>Designed and built in Seoul</span><a href="#top">Back to top ↑</a></footer>
-    </div>
-    {selected&&<TemplateModal template={selected} saved={saved.includes(selected.id)} onSave={()=>toggleSave(selected.id)} onClose={()=>setSelected(null)}/>} 
-  </div>
+const storageKey = 'hmsoft-hub:saved:v1';
+function readSaved() {
+  try {
+    const value = JSON.parse(localStorage.getItem(storageKey) ?? localStorage.getItem('hmsoft-saved') ?? '[]');
+    return Array.isArray(value) ? [...new Set(value.filter(id => templates.some(t => t.id === id)))] : [];
+  } catch { return []; }
 }
-function TemplateCard({template:t,saved,onSave,onOpen}){return <article className={`template-card tone-${t.tone}`}><button className="thumb" onClick={onOpen} aria-label={`Open details for ${t.title}`}><img src={t.image} alt="" loading="eager"/><span className="thumb-hover">View direction <ArrowUpRight size={16}/></span><span className="thumb-number">{t.number}</span></button><div className="card-body"><div className="card-line"><span className="tag">{t.tag}</span><button className={`save ${saved?'is-saved':''}`} onClick={onSave} aria-label={saved?'Remove from saved':'Save template'}><Bookmark size={16} fill={saved?'currentColor':'none'}/></button></div><button className="card-title" onClick={onOpen}>{t.title}</button><p>{t.desc}</p><div className="card-bottom"><span>{t.stack}</span><a href={t.url} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()}>Live site <ExternalLink size={13}/></a></div></div></article>}
-function TemplateModal({template:t,saved,onSave,onClose}){return <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button className="modal-close" onClick={onClose} aria-label="Close"><X size={18}/></button><div className={`modal-image tone-${t.tone}`}><img src={t.image} alt=""/><span>{t.number} / {t.category}</span></div><div className="modal-copy"><p className="kicker">{t.tag}</p><h2 id="modal-title">{t.title}</h2><p className="modal-desc">{t.desc}</p><div className="specs"><div><span>BUILD</span><strong>{t.stack}</strong></div><div><span>STATUS</span><strong><Check size={14}/> Live preview</strong></div></div><div className="modal-actions"><a className="live-button" href={t.url} target="_blank" rel="noreferrer">Open live site <ArrowUpRight size={16}/></a><button className={`save-button ${saved?'is-saved':''}`} onClick={onSave}><Bookmark size={15} fill={saved?'currentColor':'none'}/>{saved?'Saved':'Save direction'}</button></div></div></section></div>}
-export default App;
+function readFilters() {
+  const params = new URLSearchParams(location.search);
+  const requestedCategory = params.get('category');
+  return { query: params.get('q') ?? '', category: categories.some(c => c.id === requestedCategory) ? requestedCategory : 'all', onlySaved: params.get('saved') === '1' };
+}
+function SaveButton({ template, saved, onSave, withLabel = false }) {
+  return <button className={`save-button ${saved ? 'is-saved' : ''}`} onClick={onSave}
+    aria-label={`${template.title} ${saved ? '저장 해제' : '저장'}`} aria-pressed={saved}>
+    <Bookmark size={18} strokeWidth={1.6} fill={saved ? 'currentColor' : 'none'} aria-hidden="true" />
+    {withLabel ? (saved ? '저장됨' : '저장하기') : null}
+  </button>;
+}
+function Project({ template: t, saved, onSave, onOpen, featured = false }) {
+  return <article className={featured ? `featured-project featured-${t.id}` : 'project-card'}>
+    <button className="project-image" onClick={onOpen} aria-label={`${t.title} 미리보기`}>
+      <img src={t.image} alt={`${t.title} 웹사이트 첫 화면`} width="1280" height="820"
+        loading={featured ? 'eager' : 'lazy'} fetchPriority={featured && t.id === 'onyu' ? 'high' : 'auto'} />
+      <span className="preview-label">미리보기 <ArrowUpRight size={15} aria-hidden="true" /></span>
+    </button>
+    <div className="project-caption">
+      <div><h3><button onClick={onOpen}>{t.title}</button></h3><p>{t.type}</p></div>
+      <div className="project-actions"><SaveButton template={t} saved={saved} onSave={onSave} />
+        <a href={t.url} target="_blank" rel="noopener noreferrer" aria-label={`${t.title} 실제 사이트 열기 (새 탭)`}><ArrowUpRight size={20} strokeWidth={1.5} aria-hidden="true" /></a>
+      </div>
+    </div>
+  </article>;
+}
+
+export default function App() {
+  const [filters, setFilters] = useState(readFilters);
+  const [saved, setSaved] = useState(readSaved);
+  const [selected, setSelected] = useState(null);
+  const [notice, setNotice] = useState('');
+  const dialogTrigger = useRef(null);
+  const { query, category, onlySaved } = filters;
+  useEffect(() => {
+    const onPopState = () => setFilters(readFilters());
+    const onStorage = event => { if (event.key === storageKey) setSaved(readSaved()); };
+    window.addEventListener('popstate', onPopState);
+    window.addEventListener('storage', onStorage);
+    return () => { window.removeEventListener('popstate', onPopState); window.removeEventListener('storage', onStorage); };
+  }, []);
+  function updateFilters(changes) {
+    const next = { ...filters, ...changes };
+    setFilters(next);
+    const params = new URLSearchParams();
+    if (next.query) params.set('q', next.query);
+    if (next.category !== 'all') params.set('category', next.category);
+    if (next.onlySaved) params.set('saved', '1');
+    const search = params.toString();
+    history.replaceState(null, '', `${location.pathname}${search ? `?${search}` : ''}${location.hash}`);
+  }
+  function toggleSave(id) {
+    const next = saved.includes(id) ? saved.filter(value => value !== id) : [...saved, id];
+    setSaved(next);
+    try { localStorage.setItem(storageKey, JSON.stringify(next)); setNotice(next.includes(id) ? '사이트를 저장했습니다.' : '저장을 해제했습니다.'); }
+    catch { setNotice('현재 화면에 저장했습니다. 브라우저를 닫으면 목록이 사라질 수 있습니다.'); }
+  }
+  function openProject(template, event) { dialogTrigger.current = event.currentTarget; setSelected(template); }
+  function showSaved() {
+    updateFilters({ onlySaved: !onlySaved, query: '', category: 'all' });
+    requestAnimationFrame(() => document.getElementById('collection').scrollIntoView());
+  }
+  const q = query.trim().toLocaleLowerCase();
+  const filtered = templates.filter(t => (category === 'all' || t.category === category) && (!onlySaved || saved.includes(t.id)) && (!q || `${t.title} ${t.type} ${t.description} ${t.keywords}`.toLocaleLowerCase().includes(q)));
+  return <>
+    <a className="skip-link" href="#collection">템플릿 목록으로 건너뛰기</a>
+    <header className="site-header">
+      <a href="/" className="brand" aria-label="HMSOFT 디자인 허브 홈"><span className="official-logo"><img src="/favicon.png" alt="HM SOFT" width="1024" height="1024" /></span><span className="brand-label">디자인 허브</span></a>
+      <nav aria-label="주 메뉴">
+        <a className="collection-link" href="#collection" onClick={() => updateFilters({ onlySaved: false })}>템플릿</a>
+        <button className={onlySaved ? 'nav-saved active' : 'nav-saved'} onClick={showSaved} aria-pressed={onlySaved}><Bookmark size={16} strokeWidth={1.6} aria-hidden="true" /><span>저장한 사이트</span><span className="saved-count">{saved.length}</span></button>
+        <a className="company-link" href="https://hmsoft.it.kr" target="_blank" rel="noopener noreferrer">회사 소개 <ArrowUpRight size={15} aria-hidden="true" /><span className="sr-only"> (새 탭)</span></a>
+      </nav>
+    </header>
+    <main>
+      <section className="opening page-width" aria-labelledby="page-title">
+        <div className="opening-heading"><h1 id="page-title">웹사이트 컬렉션</h1><p>HMSOFT에서 직접 만든 웹사이트.<br />화면을 살펴보고, 실제 사이트에서 경험해 보세요.</p></div>
+      </section>
+      <Reel />
+      <section className="collection page-width" id="collection" aria-labelledby="collection-title">
+        <div className="collection-heading"><h2 id="collection-title">{onlySaved ? '저장한 사이트' : '전체 템플릿'} <span>{onlySaved ? saved.length : templates.length}</span></h2>
+          <label className="search-field"><Search size={17} strokeWidth={1.6} aria-hidden="true" /><input type="search" name="q" aria-label="템플릿 검색" placeholder="어떤 사이트를 찾으세요?" value={query} autoComplete="off" onChange={e => updateFilters({ query: e.target.value })} />{query ? <button onClick={() => updateFilters({ query: '' })} aria-label="검색어 지우기"><X size={16} aria-hidden="true" /></button> : null}</label>
+        </div>
+        <div className="collection-tools"><div className="category-list" role="group" aria-label="업종별 필터">{categories.map(c => <button key={c.id} className={category === c.id ? 'active' : ''} aria-pressed={category === c.id} onClick={() => updateFilters({ category: c.id })}>{c.label}</button>)}</div><span className="results-count" role="status">{filtered.length}개 사이트</span></div>
+        {filtered.length ? <div className="project-grid">{filtered.map(t => <Project key={t.id} template={t} saved={saved.includes(t.id)} onSave={() => toggleSave(t.id)} onOpen={e => openProject(t, e)} />)}</div> : <div className="empty-state"><Bookmark size={25} strokeWidth={1.2} aria-hidden="true" /><h3>{onlySaved && !saved.length ? '마음에 드는 사이트를 모아보세요.' : '조건에 맞는 사이트가 없어요.'}</h3><p>{onlySaved && !saved.length ? '각 사이트 옆의 저장 버튼을 누르면 이곳에서 다시 볼 수 있습니다.' : '다른 검색어를 입력하거나 필터를 초기화해 보세요.'}</p><button onClick={() => updateFilters({ query: '', category: 'all', onlySaved: false })}>전체 템플릿 보기</button></div>}
+      </section>
+    </main>
+    <footer className="site-footer page-width"><div className="footer-main"><a className="brand" href="/" aria-label="HMSOFT 디자인 허브 홈"><span className="official-logo"><img src="/favicon.png" alt="HM SOFT" width="1024" height="1024" /></span><span className="brand-label">디자인 허브</span></a><p>마음에 드는 방향을 찾으셨나요?<br /><a href="mailto:ceo@hmsoft.it.kr">ceo@hmsoft.it.kr</a></p><a className="footer-contact" href="mailto:ceo@hmsoft.it.kr">프로젝트 문의 <ArrowUpRight size={20} aria-hidden="true" /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} HMSOFT</span><span>웹사이트는 계속 추가됩니다.</span><a href="https://github.com/HMSOFT-WEB/template_hub" target="_blank" rel="noopener noreferrer">GitHub<span className="sr-only"> (새 탭)</span></a></div></footer>
+    <p className="sr-only" role="status">{notice}</p>
+    <Dialog.Root open={Boolean(selected)} onOpenChange={open => { if (!open) setSelected(null); }}>
+      {selected ? <Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><Dialog.Content className="project-dialog" onCloseAutoFocus={event => { event.preventDefault(); dialogTrigger.current?.focus(); }}>
+        <div className="dialog-top"><span>사이트 미리보기</span><Dialog.Close className="dialog-close" aria-label="미리보기 닫기"><X size={21} aria-hidden="true" /></Dialog.Close></div>
+        <img className="dialog-image" src={selected.image} width="1280" height="820" alt={`${selected.title} 웹사이트 첫 화면`} />
+        <div className="dialog-body"><div className="dialog-description"><p className="dialog-type">{selected.type}</p><Dialog.Title>{selected.title}</Dialog.Title><Dialog.Description>{selected.description}</Dialog.Description></div><div className="dialog-details"><h3>살펴볼 부분</h3><ul>{selected.features.map(feature => <li key={feature}><Check size={14} aria-hidden="true" />{feature}</li>)}</ul><div className="dialog-actions"><SaveButton template={selected} saved={saved.includes(selected.id)} onSave={() => toggleSave(selected.id)} withLabel /><a href={selected.url} target="_blank" rel="noopener noreferrer">사이트 열기 <ArrowUpRight size={17} aria-hidden="true" /><span className="sr-only"> (새 탭)</span></a></div></div></div>
+      </Dialog.Content></Dialog.Portal> : null}
+    </Dialog.Root>
+  </>;
+}

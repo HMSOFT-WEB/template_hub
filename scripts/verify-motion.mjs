@@ -1,0 +1,35 @@
+import { chromium, expect } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+const output = new URL('../../audit/revision/', import.meta.url);
+await mkdir(output, { recursive: true });
+const path = name => new URL(name, output).pathname.replace(/^\/([A-Z]:)/, '$1');
+const browser = await chromium.launch({ channel: 'msedge', headless: true });
+try {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'no-preference', recordVideo: { dir: path('video'), size: { width: 1440, height: 1000 } } });
+  const page = await context.newPage();
+  await page.goto(process.env.HUB_TEST_URL || 'http://127.0.0.1:5190');
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator('.reel')).toHaveAttribute('data-playing', 'true');
+  await page.waitForTimeout(1800);
+  await page.screenshot({ path: path('hub-reel-onyu.png') });
+  await page.getByRole('button', { name: '쇼릴 일시정지' }).click();
+  await expect(page.locator('.reel')).toHaveAttribute('data-playing', 'false');
+  const progressBefore = await page.locator('.reel-track > span').evaluate(el => getComputedStyle(el).transform);
+  await page.waitForTimeout(500);
+  expect(await page.locator('.reel-track > span').evaluate(el => getComputedStyle(el).transform)).toBe(progressBefore);
+  await page.getByRole('button', { name: '쇼릴 재생' }).click();
+  await expect(page.locator('.reel')).toHaveAttribute('data-project', 'serein', { timeout: 12000 });
+  await page.waitForTimeout(1600);
+  await page.screenshot({ path: path('hub-reel-serein.png') });
+  await page.locator('.reel-selector').getByRole('button', { name: 'ONYU' }).click();
+  await expect(page.locator('.reel')).toHaveAttribute('data-project', 'onyu');
+  await page.locator('.site-footer').scrollIntoViewIfNeeded();
+  await expect(page.locator('.reel')).toHaveAttribute('data-playing', 'false');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForTimeout(1600);
+  await page.screenshot({ path: path('hub-reel-mobile.png') });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await context.close();
+  console.log('PASS: motion advances, pause freezes progress, direct selection, offscreen suspension, responsive reel. Video:', await page.video().path());
+} finally { await browser.close(); }
